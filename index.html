@@ -663,7 +663,7 @@ footer a:hover { color: var(--accent); }
 const BOOK_OVERRIDES = {
   'la bible': { author: 'Sky' },
   'les hauts-parleurs': {
-    cover: '../img/thinkerbooks/damasio-hauts-parleurs.jpg',
+    cover: 'img/damasio-hauts-parleurs.jpg',
     link: 'https://www.juriscom.net/documents/HautsParleurs.pdf',
     linkLabel: 'Lire',
   },
@@ -1190,7 +1190,7 @@ async function init() {
   try {
     // Load local covers manifest (silent fail)
     try {
-      const r = await fetch('../img/thinkerbooks/covers.json', { cache: 'no-cache' });
+      const r = await fetch('img/covers.json', { cache: 'no-cache' });
       if (r.ok) {
         LOCAL_COVERS = await r.json();
         // Build normalized index (handles accent/case mismatches)
