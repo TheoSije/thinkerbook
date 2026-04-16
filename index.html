@@ -982,7 +982,8 @@ function setupSentinel() {
 const bookCache = new Map();
 const fetchQueue = [];
 let activeReqs = 0;
-const MAX_CONCURRENT = 4;
+const MAX_CONCURRENT = 2;
+const REQUEST_DELAY_MS = 300; // anti rate-limit Google Books
 
 function enqueueBook(el) {
   fetchQueue.push(el);
@@ -993,7 +994,9 @@ function processQueue() {
   while (activeReqs < MAX_CONCURRENT && fetchQueue.length > 0) {
     const el = fetchQueue.shift();
     activeReqs++;
-    loadBookForEl(el).finally(() => { activeReqs--; processQueue(); });
+    loadBookForEl(el).finally(() => {
+      setTimeout(() => { activeReqs--; processQueue(); }, REQUEST_DELAY_MS);
+    });
   }
 }
 
@@ -1018,7 +1021,7 @@ async function loadBookForEl(el) {
     // Check local manifest first (normalized lookup)
     const normKey = normalize(title) + '||' + normalize(author);
     if (normKey in LOCAL_COVERS_NORM) {
-      coverUrl = LOCAL_COVERS_NORM[normKey] ? ('../' + LOCAL_COVERS_NORM[normKey]) : null;
+      coverUrl = LOCAL_COVERS_NORM[normKey] ? LOCAL_COVERS_NORM[normKey] : null;
     } else {
       coverUrl = await fetchCover(title, author);
     }
