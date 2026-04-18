@@ -10,16 +10,16 @@
 <link rel="icon" type="image/svg+xml" href="thinkerview-logo.svg">
 <title>ThinkerBooks — Tous les livres recommandés par Thinkerview</title>
 <meta name="description" content="Tous les livres cités dans Thinkerview en un seul endroit. Plus de 1 250 références extraites de 280+ épisodes, cherchables par titre, auteur ou invité. Retrouvez instantanément le livre entendu dans une interview.">
-<link rel="canonical" href="https://thinkerbook.org/">
+<link rel="canonical" href="https://jegousse.com/thinkerbooks/">
 <meta property="og:title" content="ThinkerBooks — Les livres de Thinkerview">
 <meta property="og:description" content="Tous les livres cités dans Thinkerview réunis en un seul endroit. Plus de 1 250 références sur 280+ épisodes, cherchables par titre, auteur ou invité.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://thinkerbook.org/og-image.jpg">
+<meta property="og:image" content="https://jegousse.com/img/og-image-thinkerbooks.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:url" content="https://thinkerbook.org/">
+<meta property="og:url" content="https://jegousse.com/thinkerbooks/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://thinkerbook.org/og-image.jpg">
+<meta name="twitter:image" content="https://jegousse.com/img/og-image-thinkerbooks.jpg">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -661,6 +661,18 @@ footer a:hover { color: var(--accent); }
 // ── BOOK OVERRIDES ──
 // Keys are normalize(title) — custom cover, link, or button label per book
 const BOOK_OVERRIDES = {
+  'chroniques martiennes': {
+    link: 'https://amzn.to/4cjjB9N',
+    linkLabel: 'Acheter',
+  },
+  'fahrenheit 451': {
+    link: 'https://amzn.to/4dQIxXt',
+    linkLabel: 'Acheter',
+  },
+  'le métaphysicon': {
+    link: 'https://amzn.to/3OcbcMl',
+    linkLabel: 'Acheter',
+  },
   'la bible': { author: 'Sky' },
   'les hauts-parleurs': {
     cover: 'img/damasio-hauts-parleurs.jpg',
@@ -982,8 +994,7 @@ function setupSentinel() {
 const bookCache = new Map();
 const fetchQueue = [];
 let activeReqs = 0;
-const MAX_CONCURRENT = 2;
-const REQUEST_DELAY_MS = 300; // anti rate-limit Google Books
+const MAX_CONCURRENT = 4;
 
 function enqueueBook(el) {
   fetchQueue.push(el);
@@ -994,9 +1005,7 @@ function processQueue() {
   while (activeReqs < MAX_CONCURRENT && fetchQueue.length > 0) {
     const el = fetchQueue.shift();
     activeReqs++;
-    loadBookForEl(el).finally(() => {
-      setTimeout(() => { activeReqs--; processQueue(); }, REQUEST_DELAY_MS);
-    });
+    loadBookForEl(el).finally(() => { activeReqs--; processQueue(); });
   }
 }
 
@@ -1021,7 +1030,7 @@ async function loadBookForEl(el) {
     // Check local manifest first (normalized lookup)
     const normKey = normalize(title) + '||' + normalize(author);
     if (normKey in LOCAL_COVERS_NORM) {
-      coverUrl = LOCAL_COVERS_NORM[normKey] ? LOCAL_COVERS_NORM[normKey] : null;
+      coverUrl = LOCAL_COVERS_NORM[normKey] ? ('../' + LOCAL_COVERS_NORM[normKey]) : null;
     } else {
       coverUrl = await fetchCover(title, author);
     }
